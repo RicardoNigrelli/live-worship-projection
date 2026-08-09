@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Service {
+  id        String        @id @default(uuid())
+  name      String
+  date      DateTime
+  items     ServiceItem[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  // Default style for entire service (culto)
+  fontFamily String?
+  fontColor  String?
+  fontSize   Float?
+  bgType     String?  // COLOR, IMAGE, VIDEO
+  bgValue    String?  // Hex color or media URL
+}
+
+model ServiceItem {
+  id          String   @id @default(uuid())
+  serviceId   String
+  order       Int
+  type        String   // SONG, VERSE, ANNOUNCEMENT, MEDIA
+  
+  // Relations mapped by type
+  songId      String?
+  verseId     String?
+  deckId      String?       // Diapositiva Personalizada
+  mediaAssetId String?      // Asset de Multimedia
+  mediaUrl    String?       // URL directa legacy
+  mediaType   String?  // IMAGE, VIDEO
+  title       String?  // For custom titles if it's an announcement
+
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  song        Song?    @relation(fields: [songId], references: [id], onDelete: SetNull)
+  verse       BibleVerse? @relation(fields: [verseId], references: [id], onDelete: SetNull)
+  deck        Deck?    @relation(fields: [deckId], references: [id], onDelete: SetNull)
+  mediaAsset  MediaAsset? @relation(fields: [mediaAssetId], references: [id], onDelete: SetNull)
+}
+
+model Song {
+  id              String   @id @default(uuid())
+  title           String
+  author          String?
+  category        String?
+  
+  // Custom Styles per song
+  themeBgType     String?  // COLOR, IMAGE, VIDEO
+  themeBgValue    String?
+  themeFontFamily String?
+  themeFontColor  String?
+  themeFontSize   Float?   // Font size multiplier
+
+  parts           SongPart[]
+  serviceItems    ServiceItem[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model SongPart {
+  id        String   @id @default(uuid())
+  songId    String
+  type      String   // ESTROFA, CORO, PUENTE
+  order     Int
+  content   String
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+}
+
+model BibleVerse {
+  id        String   @id @default(uuid())
+  reference String
+  text      String
+  serviceItems ServiceItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RoomSnapshot {
+  id          String   @id 
+  songId      String?
+  title       String?
+  slideIndex  Int      @default(0)
+  slides      String   @default("[]") 
+  fontScale   Float    @default(1.0)
+  theme       String   @default("dark")
+  
+  // New style overrides pushed from ServiceItem into RoomSnapshot
+  bgType      String?
+  bgValue     String?
+  fontFamily  String?
+  fontColor   String?
+  fontSize    Float?   // Live font size override
+
+  blackout    Boolean  @default(false)
+  version     Int      @default(1)
+  activeServiceId String?
+  playlist    String   @default("[]")  // JSON: playlist completa para restaurar
+  history     String   @default("[]")  // JSON: últimos 10 estados para rollback
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── Multimedia ────────────────────────────────────────────
+model MediaAsset {
+  id           String        @id @default(uuid())
+  title        String
+  type         String        // IMAGE, VIDEO
+  url          String        // Cloudinary URL
+  thumbnailUrl String?
+  publicId     String?       // Cloudinary public_id for deletion
+  fileSize     Int?
+  mimeType     String?
+  serviceItems ServiceItem[]
+  createdAt    DateTime      @default(now())
+}
+
+// ─── Diapositivas Personalizadas ──────────────────────────
+model Deck {
+  id           String      @id @default(uuid())
+  title        String
+  slides       DeckSlide[]
+  serviceItems ServiceItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model DeckSlide {
+  id         String   @id @default(uuid())
+  deckId     String
+  order      Int
+  text       String?           // texto principal
+  layout     String   @default("CENTER")  // CENTER, LEFT, SPLIT
+  bgColor    String?            // fondo color sólido
+  bgImageUrl String?            // imagen de fondo (cubre todo)
+  bgVideoUrl String?            // video de fondo en loop
+  fontColor  String?
+  fontSize   Int?
+  layers     String   @default("[]")  // JSON: imágenes flotantes posicionables
+  deck       Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+}
+
+// ─── Stage: anotaciones personales de músicos ─────────────
+// Cada cantante marca su rol, tono y notas por estrofa para una reunión.
+// No es auth real: identidad amistosa para que a cada uno le aparezca lo suyo.
+model SingerProfile {
+  id          String            @id @default(uuid())
+  name        String
+  pin         String?           // PIN opcional (4 dígitos) para reclamar el perfil en otro dispositivo
+  annotations StageAnnotation[]
+  createdAt   DateTime          @default(now())
+}
+
+model StageAnnotation {
+  id        String        @id @default(uuid())
+  profileId String
+  serviceId String        // reunión (presentación de ese día)
+  songId    String
+  role      String?       // mi rol ese día: LEAD, VOICE1, VOICE2, ...
+  note      String?       // nota general de la canción
+  parts     String        @default("{}")  // JSON: { [partId]: { tag, note } }
+  updatedAt DateTime      @updatedAt
+  profile   SingerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, serviceId, songId])
+}
+
+// Tono grupal (se decide en clase) — compartido por todos los cantantes.
+model ServiceSongMeta {
+  id        String   @id @default(uuid())
+  serviceId String
+  songId    String
+  keyLabel  String?  // tono ese día (ej: "Sol", "Am")
+  updatedAt DateTime @updatedAt
+
+  @@unique([serviceId, songId])
+}
