@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, Suspense, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useProyectaStore } from '../store/useProyectaStore';
 import MediaSlide from '../components/MediaSlide';
 import ScreenCanvas from '../components/ScreenCanvas';
@@ -187,6 +188,12 @@ function DisplayContent() {
       <div className="bg-black min-h-screen w-full transition-colors duration-700 flex flex-col justify-center items-center p-4 gap-6">
         <span className="text-white/15 font-headline font-black text-[6vw] uppercase tracking-widest select-none">Urban</span>
         <div className="text-white/40 text-xs font-headline font-bold uppercase tracking-widest animate-pulse">Esperando señal de conexión...</div>
+        <div className="text-white/25 text-[10px] uppercase tracking-widest mt-4">
+          Esta es la pantalla de proyección en vivo — para ver el panel de administración:{' '}
+          <Link href="/dashboard/login" className="text-white/60 underline hover:text-white/90">
+            entrar al dashboard
+          </Link>
+        </div>
       </div>
     );
   }

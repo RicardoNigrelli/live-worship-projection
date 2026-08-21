@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { password } = await request.json();
+    const { password, demo } = await request.json();
 
-    if (password === process.env.DASHBOARD_PASSWORD) {
+    // Pieza de portafolio publica: "Ver demo" evita que un visitante tenga
+    // que conocer/escribir la contraseña real para entrar. Sin riesgo real:
+    // esta build corre con datos sinteticos, no la instalacion real de un
+    // cliente.
+    if (demo === true || password === process.env.DASHBOARD_PASSWORD) {
       const response = NextResponse.json({ success: true });
       // NOTE: path must be '/' (not '/dashboard') even though only /dashboard/* pages
       // check this cookie in middleware.ts. /dashboard/control also needs it sent to

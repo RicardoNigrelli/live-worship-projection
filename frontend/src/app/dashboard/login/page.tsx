@@ -8,18 +8,17 @@ export default function DashboardLogin() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitLogin = async (body: { password?: string; demo?: boolean }) => {
     setError('');
     setLoading(true);
-    
+
     try {
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify(body)
       });
-      
+
       const data = await res.json();
       if (res.ok && data.success) {
         router.push('/dashboard');
@@ -32,6 +31,13 @@ export default function DashboardLogin() {
       setLoading(false);
     }
   };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitLogin({ password });
+  };
+
+  const handleDemoLogin = () => submitLogin({ demo: true });
 
   return (
     <div className="min-h-screen bg-urban-bg flex flex-col justify-center items-center p-4">
@@ -50,14 +56,25 @@ export default function DashboardLogin() {
             />
           </div>
           {error && <p className="text-urban-coral-400 font-bold text-sm">{error}</p>}
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
             className="mt-2 bg-urban-black-900 text-urban-surface py-3 px-4 font-bold tracking-wider hover:bg-urban-teal-500 urban-transition disabled:opacity-50"
           >
             {loading ? 'VERIFICANDO...' : 'ENTRAR'}
           </button>
         </form>
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          disabled={loading}
+          className="mt-3 w-full border-2 border-urban-teal-500 text-urban-teal-500 py-3 px-4 font-bold tracking-wider hover:bg-urban-teal-500 hover:text-urban-surface urban-transition disabled:opacity-50"
+        >
+          VER DEMO (SIN CONTRASEÑA)
+        </button>
+        <p className="text-center text-xs text-urban-text/60 mt-4">
+          Pieza de portafolio — datos sintéticos, sin datos reales de ninguna iglesia
+        </p>
       </div>
     </div>
   );
