@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
 import { API_URL } from '@/lib/api';
+import { toast } from '@/components/Toast';
 
 type MediaAsset = {
   id: string;
@@ -44,11 +45,21 @@ export default function MediaPage() {
       formData.append('file', file);
       formData.append('title', file.name.replace(/\.[^/.]+$/, ''));
       try {
-        await fetch(`${API_URL}/api/media/upload`, {
+        const res = await fetch(`${API_URL}/api/media/upload`, {
           method: 'POST',
           body: formData,
         });
-      } catch (e) { console.error(e); }
+        if (!res.ok) {
+          // Pieza de portafolio pública: sin credenciales reales de
+          // Cloudinary configuradas, la subida siempre va a fallar acá —
+          // sin este chequeo, el spinner terminaba y no pasaba nada, sin
+          // ningún indicio de por qué.
+          toast('Subida de archivos no disponible en esta demo pública (sin credenciales reales configuradas)', 'error');
+        }
+      } catch (e) {
+        console.error(e);
+        toast('Error al subir el archivo', 'error');
+      }
     }
     setUploading(false);
     setUploadProgress('');

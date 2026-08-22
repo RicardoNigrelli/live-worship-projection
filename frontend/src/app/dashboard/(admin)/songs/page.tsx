@@ -354,6 +354,15 @@ export default function SongsPage() {
         body: JSON.stringify({ playlistUrl: spotifyUrl }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        // Pieza de portafolio pública: sin credenciales reales de Spotify
+        // configuradas, esto siempre va a fallar — un mensaje genérico de
+        // "error de red" confundiría a un visitante que espera una demo.
+        toast('Spotify no está disponible en esta demo pública (sin credenciales reales configuradas)', 'error');
+        setSpotifyLoading(false);
+        setSpotifySearchDone(true);
+        return;
+      }
       setSpotifyTracks(data.tracks);
       setSpotifySearchDone(true);
       setSpotifyLoading(false);
