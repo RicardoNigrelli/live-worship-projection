@@ -39,3 +39,60 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Tour de onboarding (driver.js) — mismo lenguaje visual que el resto: sin
+   radios, mayúsculas trackeadas, acento teal (--primary). */
+.urban-tour.driver-popover {
+  background: #09090b;
+  color: #fafafa;
+  border: 1px solid #27272a;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 20px;
+}
+.urban-tour .driver-popover-title {
+  color: #fff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-style: italic;
+  font-size: 16px;
+}
+.urban-tour .driver-popover-description {
+  color: #a1a1aa;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.urban-tour .driver-popover-progress-text {
+  color: #2dd4bf;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.urban-tour .driver-popover-navigation-btns button {
+  background: #006767;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: none;
+  padding: 8px 16px;
+}
+.urban-tour .driver-popover-close-btn {
+  color: #71717a;
+}
+.urban-tour .driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: #09090b;
+}
+.urban-tour .driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: #09090b;
+}
+.urban-tour .driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: #09090b;
+}
+.urban-tour .driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: #09090b;
+}

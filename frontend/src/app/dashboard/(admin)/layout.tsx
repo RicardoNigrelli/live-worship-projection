@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import ToastContainer from '@/components/Toast';
 import { API_URL } from '@/lib/api';
+import { TourButton } from '@/components/TourButton';
 
 // SEC: The admin dashboard's backend write routes (songs/services/decks/media/export)
 // require an `x-api-key` header. Rather than editing every one of the ~50 fetch()
@@ -85,18 +86,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* SideNavBar */}
       <nav className={`absolute lg:relative z-40 bg-zinc-950 dark:bg-black flex flex-col py-8 transition-all duration-300 ease-in-out shrink-0 h-full overflow-hidden whitespace-nowrap border-none ${isCollapsed ? '-translate-x-full lg:translate-x-0 w-0 lg:w-20 px-0 lg:px-4' : 'translate-x-0 w-72 px-6 shadow-2xl lg:shadow-none'}`}>
-        <div className={`mb-12 flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
+        <div id="tour-header" className={`mb-12 flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
           <h1 className={`font-black tracking-tighter text-white uppercase font-headline italic transition-all ${isCollapsed ? 'text-[10px] -rotate-90 mt-12 w-4' : 'text-2xl'}`}>
             {isCollapsed ? 'URBAN' : 'URBAN LYRICS'}
           </h1>
         </div>
-        
-        <Link href="/dashboard/control" className={`w-full bg-primary hover:bg-primary-container text-white py-3 rounded-none font-headline font-bold text-sm tracking-widest uppercase transition-colors duration-200 mb-8 flex items-center gap-2 hover:shadow-[0_4px_0_0_theme(colors.primary-container)] ${isCollapsed ? 'justify-center px-0' : 'justify-center px-4'}`} title="Entrar a Cabina">
+
+        <Link id="tour-cabina" href="/dashboard/control" className={`w-full bg-primary hover:bg-primary-container text-white py-3 rounded-none font-headline font-bold text-sm tracking-widest uppercase transition-colors duration-200 mb-8 flex items-center gap-2 hover:shadow-[0_4px_0_0_theme(colors.primary-container)] ${isCollapsed ? 'justify-center px-0' : 'justify-center px-4'}`} title="Entrar a Cabina">
           <span className="material-symbols-outlined text-[18px]">sensors</span>
           {!isCollapsed && <span>CABINA</span>}
         </Link>
-        
-        <div className="flex-1 flex flex-col gap-2">
+
+        <div id="tour-nav" className="flex-1 flex flex-col gap-2">
           {navLinks.map((link) => {
             const isActive = pathname === link.href || pathname.startsWith(link.href + '/') && link.href !== '/dashboard';
             return (
@@ -128,6 +129,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
           <div className="flex items-center gap-4 lg:gap-6">
+            <TourButton />
             <button
               onClick={toggleTheme}
               aria-label={dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
@@ -138,7 +140,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {dark ? 'light_mode' : 'dark_mode'}
               </span>
             </button>
-            <div className="hidden md:flex flex-col items-end">
+            <div id="tour-status" className="hidden md:flex flex-col items-end">
               <span className="font-headline font-black tracking-tighter text-sm flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                 CONECTADO
